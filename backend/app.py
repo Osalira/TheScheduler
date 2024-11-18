@@ -117,6 +117,32 @@ def tasks():
             logging.error(f"Error fetching tasks: {e}")
             return jsonify({"error": str(e)}), 500
 
+@app.route('/tasks/<int:task_id>', methods=['GET'])
+def get_task(task_id):
+    try:
+        cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
+        row = cursor.fetchone()
+        if not row:
+            return jsonify({"error": "Task not found"}), 404
+
+        task = {
+            "id": row[0],
+            "title": row[1],
+            "time_to_complete": row[2],
+            "notes": row[3],
+            "status": row[4],
+            "reoccurring": row[5],
+            "priority": row[6],
+            "day_of_week": row[7],
+            "time_slot": row[8],
+            "created_at": row[9]
+        }
+        return jsonify(task)
+    except psycopg2.Error as e:
+        logging.error(f"Error fetching task: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 # Update a task
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
