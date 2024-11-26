@@ -12,7 +12,8 @@ import WeeklyScheduler from '../components/WeeklyScheduler/WeeklyScheduler';
 import NavbarItem from '../components/NavbarItem/NavbarItem';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
-import { fetchTasks } from './api';
+import { fetchTasks, updateTask, deleteTask } from './api';
+
 
 function HomePage() {
   const [tasks, setTasks] = useState([]);
@@ -38,9 +39,40 @@ function HomePage() {
   };
   // Fetch tasks from backend
   useEffect(() => {
-    fetchTasks()
-      .then(setTasks)
-      .catch((error) => console.error('Error loading tasks:', error));
+    const initializeSchedule = async () => {
+      try {
+        const fetchedTasks = await fetchTasks();
+        
+        const newSchedule = {
+          Monday: Array(48).fill(null),
+          Tuesday: Array(48).fill(null),
+          Wednesday: Array(48).fill(null),
+          Thursday: Array(48).fill(null),
+          Friday: Array(48).fill(null),
+          Saturday: Array(48).fill(null),
+          Sunday: Array(48).fill(null),
+        };
+  
+        fetchedTasks.forEach((task) => {
+          if (task.day_of_week && task.time_slot !== null) {
+            newSchedule[task.day_of_week][task.time_slot] = task;
+          }
+        });
+        setSchedule(newSchedule);
+// here i'm getting filtering element in the 
+//todolist, such that only element not in schedule appear on todolist
+
+      const todoListTasks = fetchedTasks.filter(
+        (task) => !task.day_of_week && task.time_slot === null
+      );
+            
+      setTasks(todoListTasks);
+      } catch (error) {
+        console.error('Error initializing schedule:', error);
+      }
+    };
+  
+    initializeSchedule();
   }, []);
   
 
@@ -117,7 +149,7 @@ const moveTaskInScheduleWithShifting = (schedule, source, target) => {
 
 
 
-const handleDragEnd = (event) => {
+const handleDragEnd = async(event) => {
   const { active, over } = event;
 
   if (!over || !over.id) return; // Ensure there's a valid drop target
@@ -130,6 +162,7 @@ const handleDragEnd = (event) => {
   console.log("Active Task:", taskId);
   console.log("Drop Target ID:", dropTargetId);
   console.log("Source ID:", sourceId);
+  
 
   if (sourceId === 'todolist' && tasks.some((task) => task.id === dropTargetId)) {
     // Reorder tasks within TodoList
@@ -139,52 +172,67 @@ const handleDragEnd = (event) => {
     if (activeIndex !== overIndex) {
       setTasks((prevTasks) => arrayMove(prevTasks, activeIndex, overIndex));
     }
-  } else if (sourceId === 'todolist' && isTimeSlot(dropTargetId)) {
-    // Move from TodoList to WeeklyScheduler with recursive shifting
+  } else if (sourceId === "todolist" && isTimeSlot(dropTargetId)) {
+    // Move from TodoList to WeeklyScheduler
+    const [targetDay, targetSlot] = dropTargetId.split('-');
+
+    await updateTask(taskId, targetDay, parseInt(targetSlot, 10));
+
     setSchedule((prevSchedule) =>
       addTaskToScheduleWithShifting(prevSchedule, tasks, taskId, dropTargetId)
     );
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => {
+      // Filter out the moved task from the TodoList
+      return prevTasks.filter((task) => task.id !== taskId);
+    });
+
   } else if (isTimeSlot(sourceId) && isTimeSlot(dropTargetId)) {
-    // Move within WeeklyScheduler with recursive shifting
+    // Move within WeeklyScheduler
+    // const [sourceDay, sourceSlot] = sourceId.split('-');
+
+    const [targetDay, targetSlot] = dropTargetId.split('-');
+
+    await updateTask(taskId, targetDay, parseInt(targetSlot, 10));
+
     setSchedule((prevSchedule) =>
       moveTaskInScheduleWithShifting(prevSchedule, sourceId, dropTargetId)
     );
-  } else if (isTimeSlot(sourceId) && tasks.some((task) => task.id === dropTargetId)) {
-    // Move from WeeklyScheduler to TodoList and reorder at dropTargetId
+  } else if (isTimeSlot(sourceId) && !isNaN(dropTargetId)) {
+    // Move from WeeklyScheduler to TodoList
     const draggedTask = Object.values(schedule)
       .flat()
       .find((task) => task?.id === taskId);
 
     if (draggedTask) {
-      const targetIndex = tasks.findIndex((task) => task.id === dropTargetId);
+      try {
+        // Update task in the backend
+        await updateTask(taskId, null, null); // Set day_of_week and time_slot to null
 
-      setTasks((prevTasks) => {
-        // Insert draggedTask at the targetIndex, shifting the rest
-        const updatedTasks = [...prevTasks];
-        updatedTasks.splice(targetIndex, 0, draggedTask); // Insert at targetIndex
-        return updatedTasks;
-      });
-
-      setSchedule((prevSchedule) => {
-        // Remove the dragged task from the schedule
-        const updatedSchedule = { ...prevSchedule };
-        Object.keys(updatedSchedule).forEach((day) => {
-          updatedSchedule[day] = updatedSchedule[day].map((slot) =>
-            slot?.id === taskId ? null : slot
-          );
+        // Update the state to reflect the changes
+        setTasks((prevTasks) => [...prevTasks, draggedTask]); // Add back to TodoList
+        setSchedule((prevSchedule) => {
+          const updatedSchedule = deepCloneSchedule(prevSchedule);
+          Object.keys(updatedSchedule).forEach((day) => {
+            updatedSchedule[day] = updatedSchedule[day].map((slot) =>
+              slot?.id === taskId ? null : slot
+            );
+          });
+          return updatedSchedule; // Clear the spot in WeeklyScheduler
         });
-        return updatedSchedule;
-      });
+      } catch (error) {
+        console.error("Error updating task:", error);
+      }
     }
-  } else {
-    console.warn('Unhandled drop target:', dropTargetId);
   }
 };
 
 
 const sensors = useSensors(
-  useSensor(PointerSensor),
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 10, // Drag initiates only if pointer moves more than 10 pixels
+    },
+  }),
   useSensor(TouchSensor),
   useSensor(KeyboardSensor, {
     coordinateGetter: sortableKeyboardCoordinates,
@@ -199,7 +247,11 @@ const sensors = useSensors(
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="homepage-container content row ">
           <div className="row container-fluid">
-            <TodoList tasks={tasks} setTasks={setTasks} />
+            <TodoList tasks={tasks}
+             setTasks={setTasks} 
+             
+             deleteTask={deleteTask}
+             />
             
             <WeeklyScheduler schedule={schedule} setSchedule={setSchedule} tasks={tasks} />
             

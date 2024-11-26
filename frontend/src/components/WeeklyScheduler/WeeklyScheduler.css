@@ -28,6 +28,7 @@
 .droppable-slot{
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
+    /* display: flex; */
     position: relative;
     /* justify-content: left;
     align-items: top; */

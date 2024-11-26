@@ -1,28 +1,8 @@
-/* .task-card {
-  display: flex;
-  flex-direction: column; */
-  
-  /*justify-content: center;  Spread content */
-  /* align-items: center; Center content horizontally */
-  /* height: 100%; */
-   /*width: 100%; /* Fully fill the container width */
-  /*box-sizing: border-box; /* Include padding/border in size */
-  /* background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
-  /*overflow: hidden;  /*Prevent overflow */
-  /* text-overflow: ellipsis; Truncate overflowing text */
-  /* position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
-} */
+
 
 /* Task Card */
 .task-card {
-  position: absolute; /* Prevent tasks from pushing rows */
+  position: relative; /* Prevent tasks from pushing rows */
   overflow: hidden; /* Prevent overflow */
   height: 100%;
   width: 100%; 
@@ -38,8 +18,8 @@
   font-size: 14px;
   /* text-align: center; */
   z-index: 3;
+  transition: box-shadow 0.3s ease;
 }
-
 
 .task-card:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -67,4 +47,38 @@
   padding-right: 0.2rem;
   padding-bottom: 0.2rem;
   text-align: right;
+}
+
+/* .delete-icon{
+  
+  display: flex;
+} */
+.task-card .delete-icon {
+  position: absolute;
+  bottom: 5px;
+  left: 1px;
+  /* top: 0px;
+  right: 5px; */
+  height: 1.5rem;
+  width: 1.9rem;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: rgb(15, 3, 3);
+  cursor: pointer;
+  visibility: hidden; /*Initially hidden */
+  z-index: 2;
+}
+
+.task-card:hover .delete-icon {
+  visibility: visible; /*Show on hover*/
+  /* color: red; */
+}
+
+.task-card .task-time{
+  display: inline-flex;
+  position: absolute;
+  bottom: 0;
+  right: 2px;
+  font-weight: 600;
 }
