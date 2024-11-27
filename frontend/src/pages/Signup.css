@@ -1,6 +1,6 @@
 /* Signup.css */
 
-body {
+body.logout-page {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
@@ -12,7 +12,7 @@ body {
     color: #333;
   }
   
-  .loginBox {
+  .logoutBox {
     width: 400px;
     background: #fff;
     border-radius: 10px;
@@ -20,16 +20,16 @@ body {
     overflow: hidden;
   }
   
-  .inner {
+  .logoutBox .inner {
     padding: 30px;
   }
   
-  .register .top {
+  .logoutBox .register .top {
     text-align: center;
     margin-bottom: 20px;
   }
   
-  .logo {
+  .logoutBox .logo {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -37,35 +37,35 @@ body {
     margin-bottom: 15px;
   }
   
-  .title {
+  .logoutBox .title {
     font-size: 24px;
     font-weight: bold;
     color: #333;
   }
   
-  .subtitle {
+  .logoutBox .subtitle {
     font-size: 14px;
     color: #666;
   }
   
-  .subtitle-action {
+  .logoutBox .subtitle-action {
     color: #2575fc;
     text-decoration: none;
     font-weight: 500;
   }
   
-  .subtitle-action:hover {
+  .logoutBox .subtitle-action:hover {
     text-decoration: underline;
   }
   
-  .form {
+  .logoutBox .form {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-bottom: 20px;
   }
   
-  .w100 {
+  .logoutBox .w100 {
     width: 100%;
     padding: 10px 15px;
     font-size: 14px;
@@ -75,12 +75,12 @@ body {
     transition: all 0.3s ease;
   }
   
-  .w100:focus {
+  .logoutBox .w100:focus {
     border-color: #2575fc;
     box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
   }
   
-  .action {
+  .logoutBox .action {
     width: 100%;
     padding: 12px 15px;
     background: #2575fc;
@@ -93,11 +93,11 @@ body {
     transition: background 0.3s ease;
   }
   
-  .action:hover {
+  .logoutBox .action:hover {
     background: #1d5bcc;
   }
   
-  .error {
+  .logoutBox .error {
     color: #ff4d4d;
     font-size: 14px;
     margin-top: 10px;
@@ -109,11 +109,11 @@ body {
       width: 90%;
     }
   
-    .inner {
+    .logoutBox .inner {
       padding: 20px;
     }
   
-    .title {
+    .logoutBox .title {
       font-size: 20px;
     }
   }

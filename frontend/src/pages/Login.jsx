@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css'; // Optional for styling
@@ -9,16 +9,24 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.body.classList.add("login-page");
+
+    return () => {
+      // Clean up by removing the class when the component unmounts
+      document.body.classList.remove("login-page");
+    };
+  }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('http://localhost:5000/api/login', {
         email: identifier,
         password,
       });
       // Save token in localStorage or context
       localStorage.setItem('authToken', response.data.token);
-      navigate('/'); // Redirect to the desired page after login
+      navigate('/home'); // Redirect to the desired page after login
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }

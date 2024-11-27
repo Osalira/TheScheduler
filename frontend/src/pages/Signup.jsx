@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Signup.css'; // Optional for styling
@@ -17,6 +17,15 @@ function Signup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  useEffect(() => {
+    document.body.classList.add("logout-page");
+
+    return () => {
+      // Clean up by removing the class when the component unmounts
+      document.body.classList.remove("logout-page");
+    };
+  }, []);
+
   const handleSignup = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -24,7 +33,7 @@ function Signup() {
       return;
     }
     try {
-      await axios.post('http://localhost:5000/register', {
+      await axios.post('http://localhost:5000/api/register', {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -36,7 +45,7 @@ function Signup() {
   };
 
   return (
-    <div className="loginBox">
+    <div className="logoutBox">
       <div className="inner">
         <div className="register">
           <div className="top">

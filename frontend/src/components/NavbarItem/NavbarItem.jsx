@@ -65,6 +65,9 @@ function NavbarItem() {
                     <li><a className="dropdown-item" href="/something-else">Something else here</a></li>
                   </ul>
                 </li> */}
+                <li className="nav-item">
+                  <a className="nav-link fw-bold active" aria-current="page" href="/logout">Logout</a>
+                </li>
               </ul>
               <form className="d-flex mt-3" role="search">
                 <input

@@ -1,6 +1,6 @@
 /* Login.css */
 
-body {
+body.login-page {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
@@ -20,16 +20,16 @@ body {
     overflow: hidden;
   }
   
-  .inner {
+  .loginBox .inner {
     padding: 30px;
   }
   
-  .signIn .top {
+  .loginBox .signIn .top {
     text-align: center;
     margin-bottom: 20px;
   }
   
-  .logo {
+  .loginBox .logo {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -37,35 +37,35 @@ body {
     margin-bottom: 15px;
   }
   
-  .title {
+  .loginBox .title {
     font-size: 24px;
     font-weight: bold;
     color: #333;
   }
   
-  .subtitle {
+  .loginBox .subtitle {
     font-size: 14px;
     color: #666;
   }
   
-  .subtitle-action {
+  .loginBox .subtitle-action {
     color: #2575fc;
     text-decoration: none;
     font-weight: 500;
   }
   
-  .subtitle-action:hover {
+  .loginBox .subtitle-action:hover {
     text-decoration: underline;
   }
   
-  .form {
+  .loginBox .form {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-bottom: 20px;
   }
   
-  .w100 {
+  .loginBox .w100 {
     width: 100%;
     padding: 10px 15px;
     font-size: 14px;
@@ -75,12 +75,12 @@ body {
     transition: all 0.3s ease;
   }
   
-  .w100:focus {
+  .loginBox .w100:focus {
     border-color: #2575fc;
     box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
   }
   
-  .action {
+  .loginBox .action {
     width: 100%;
     padding: 12px 15px;
     background: #2575fc;
@@ -93,11 +93,11 @@ body {
     transition: background 0.3s ease;
   }
   
-  .action:hover {
+  .loginBox .action:hover {
     background: #1d5bcc;
   }
   
-  .error {
+  .loginBox .error {
     color: #ff4d4d;
     font-size: 14px;
     margin-top: 10px;
@@ -109,11 +109,11 @@ body {
       width: 90%;
     }
   
-    .inner {
+    .loginBox .inner {
       padding: 20px;
     }
   
-    .title {
+    .loginBox .title {
       font-size: 20px;
     }
   }
