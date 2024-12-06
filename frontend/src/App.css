@@ -1,0 +1,16 @@
+
+/* .row {
+  height: 90vh; 
+} */
+
+/* .container-fluid {
+  flex: 1;
+} */
+
+/* .homepage-container {
+  max-height: 88vh;
+} */
+html, body {
+  overflow: hidden; /* Prevents scrolling */
+  height: 100%; 
+}

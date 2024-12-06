@@ -1,0 +1,120 @@
+/* Signup.css */
+
+body.logout-page {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: #333;
+  }
+  
+  .logoutBox {
+    width: 400px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  
+  .logoutBox .inner {
+    padding: 30px;
+  }
+  
+  .logoutBox .register .top {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .logoutBox .logo {
+    width: 100%;
+    height: 100%;
+    /* border-radius: 50%; */
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+  
+  .logoutBox .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .logoutBox .subtitle {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .logoutBox .subtitle-action {
+    color: #2575fc;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .logoutBox .subtitle-action:hover {
+    text-decoration: underline;
+  }
+  
+  .logoutBox .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .logoutBox .w100 {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  .logoutBox .w100:focus {
+    border-color: #2575fc;
+    box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+  }
+  
+  .logoutBox .action {
+    width: 100%;
+    padding: 12px 15px;
+    background: #2575fc;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .logoutBox .action:hover {
+    background: #1d5bcc;
+  }
+  
+  .logoutBox .error {
+    color: #ff4d4d;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  @media screen and (max-width: 480px) {
+    .loginBox {
+      width: 90%;
+    }
+  
+    .logoutBox .inner {
+      padding: 20px;
+    }
+  
+    .logoutBox .title {
+      font-size: 20px;
+    }
+  }
+  

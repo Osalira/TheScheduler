@@ -1,0 +1,119 @@
+/* Weekly Scheduler Container */
+.weekly-scheduler-container {
+    border: 1px solid #ddd; /* Add border for clarity */
+    background-color: #f9f9f9; /* Optional: Background color */
+    height: 84vh; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent content wrapping */
+}
+
+
+
+/* Weekly Scheduler Grid */
+.weekly-scheduler-grid {
+    display: grid;
+    grid-auto-rows: 50px; /* Each hour = 50px */
+    grid-auto-flow: dense; /* Allow tasks to span multiple rows */
+    border-collapse: collapse;
+}
+
+/* Droppable Slot */
+.droppable-slot .droppable-box-slot{
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    position: relative;
+}
+
+.droppable-slot{
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    /* display: flex; */
+    position: relative;
+    /* justify-content: left;
+    align-items: top; */
+}
+
+
+
+/* Headers Section */
+.time-header {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 50px;
+    border-right: 1px solid #ddd;
+    
+}
+
+/* .weekly-scheduler{
+    position: relative;
+} */
+
+.day-header {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 50px;
+    border-left: 1px solid #ddd;
+    
+}
+
+/* Time Slots */
+.time-slot {
+    text-align: center;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #141414;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #0f0e0e;
+}
+
+.droppable-slot:hover {
+    background-color: #86c586; /* Highlight on hover */
+}
+
+/* Task Cards */
+
+
+/* .weekly-scheduler-headers {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+} */
+
+.weekly-scheduler-grid .time-header{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #87a31f;
+}
+
+.weekly-scheduler-grid .day-header{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #87a31f;
+}
+
+::-webkit-scrollbar{
+    width: 10px;
+}
+
+::-webkit-scrollbar-track{
+    background-color: #87a31f;
+}
+
+::-webkit-scrollbar-thumb{
+    background: linear-gradient( rgb(227, 230, 84),rgb(128, 128, 134));
+}
