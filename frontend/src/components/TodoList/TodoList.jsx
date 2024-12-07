@@ -4,12 +4,13 @@ import { useDroppable } from "@dnd-kit/core";
 import TaskCard from "./TaskCard";
 import TaskAdder from "./TaskAdder";
 import PLusIcon from "../../icons/PlusICon";
+// import { fetchTasks } from "../../pages/api";
 
 import "./TodoList.css";
 
 function TodoList({ tasks, setTasks, deleteTask, handleAddTask }) {
 
-  // console.log("a function", deleteTask);
+  // console.log("tasks passed from homepage", tasks);
   const { setNodeRef } = useDroppable({ id: "todolist" });
   const [showModal, setShowModal] = useState(false);
 
@@ -19,8 +20,6 @@ function TodoList({ tasks, setTasks, deleteTask, handleAddTask }) {
     }
     setShowModal(false);
   };
-  
-  
 
   return (
     <div ref={setNodeRef} className="col-2 border-end todo-list-container">

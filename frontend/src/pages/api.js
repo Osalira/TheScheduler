@@ -1,18 +1,10 @@
 // api.js
-import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
-export const fetchTasks = async () => {
+export const fetchTasks = async (apiClient) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/tasks`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        "Content-Type": "application/json",
-
-      },
-    });
-    console.log("Tasks fetched:", response.data);
+    const response = await apiClient.get("/api/tasks");
     return response.data.map((task) => ({
       id: task.id,
       title: task.title,
@@ -26,17 +18,22 @@ export const fetchTasks = async () => {
   }
 };
 
-
-export const updateTask = async (taskId, dayOfWeek, timeSlot) => {
+export const fetchUsername = async (apiClient) => {
   try {
-    const response = await axios.put(
-      `${API_BASE_URL}/api/tasks/${taskId}`,
-      { day_of_week: dayOfWeek, time_slot: timeSlot },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      }
+    const response = await apiClient.get("/api/current_user");
+    return response.data.username; // Adjust this based on your API response structure
+  } catch (error) {
+    console.error("Error fetching username:", error.response?.data || error);
+    throw error;
+  }
+};
+
+
+export const updateTask = async (apiClient,taskId, dayOfWeek, timeSlot) => {
+  try {
+    const response = await apiClient.put(
+      `/api/tasks/${taskId}`,
+      { day_of_week: dayOfWeek, time_slot: timeSlot }
     );
     return response.data;
   } catch (error) {
@@ -45,13 +42,9 @@ export const updateTask = async (taskId, dayOfWeek, timeSlot) => {
   }
 };
 
-export const deleteTask = async (taskId) => {
+export const deleteTask = async (apiClient, taskId) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/api/tasks/${taskId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-      },
-    });
+    const response = await apiClient.delete(`/api/tasks/${taskId}`);
     console.log(`Task ${taskId} deleted successfully.`);
     return response.data;
   } catch (error) {
@@ -62,35 +55,15 @@ export const deleteTask = async (taskId) => {
 
 
 
-export const handleAddTask = async (taskData) => {
- 
-  
-  console.log("the data to send", taskData)
-
+export const handleAddTask = async (apiClient, taskData) => {
   try {
-    const token = localStorage.getItem('authToken');
-    // console.error('token:', token);
-    if (!token) {
-      throw new Error('Authentication token missing');
-    }
-
-    const response = await axios.post(
-      `${API_BASE_URL}/api/addtasks`,
-        taskData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        
-      }
-    );
-
-    console.log('Task successfully added:', response.data.task);
-    return response.data.task; // Return the created task
+    const response = await apiClient.post("/api/addtasks", taskData);
+    console.log("Task successfully added:", response.data.task);
+    return response.data.task;
   } catch (error) {
-    console.error('Error adding task:', error);
+    console.error("Error adding task:", error.response?.data || error);
     throw error;
   }
 };
+
 

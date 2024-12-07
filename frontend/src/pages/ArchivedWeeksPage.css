@@ -1,0 +1,47 @@
+.archived-weeks-page {
+    padding: 20px;
+  }
+  
+  .archived-week {
+    margin-bottom: 40px;
+  }
+  
+  .archived-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for 7 days */
+    gap: 10px;
+  }
+  
+  .grid-header {
+    display: contents; /* Allows children to participate in the grid layout */
+  }
+  
+  .grid-day-header {
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    background-color: #f5f5f5;
+  }
+  
+  .grid-content {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* Same 7 columns as header */
+    grid-auto-rows: 50px; /* Each row represents 30 minutes, adjust as needed */
+    gap: 5px;
+  }
+  
+  .grid-day-column {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .grid-task-card {
+    background-color: #d9edf7;
+    border: 1px solid #bce8f1;
+    padding: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  

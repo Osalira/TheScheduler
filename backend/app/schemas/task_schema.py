@@ -3,6 +3,7 @@ from marshmallow import Schema, fields
 
 
 class TaskSchema(Schema):
+    id = fields.Int(required=True)  # Ensure `id` is included in the serialized response
     title = fields.Str(required=False, allow_none=True)  # Optional, allows None or a string
     time_to_complete = fields.Float(required=False)  # Optional, must be a float
     status = fields.Str(required=False)  # Optional, must be a string

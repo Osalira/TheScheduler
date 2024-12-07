@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 // import axios from 'axios';
+// import { useApiClient } from '../ApiProvider';
+import { useApiClient } from '../../pages/ApiProvider';
 import './TaskAdder.css';
 
 function TaskAdder({ onTaskAdded, handleAddTask }) {
+  const apiClient = useApiClient(); 
   const [newTask, setNewTask] = useState({
     title: '',
     time_to_complete: '1',
@@ -32,7 +35,7 @@ function TaskAdder({ onTaskAdded, handleAddTask }) {
       
   
       // Use handleAddTask passed as a prop to send the task
-      const addedTask = await handleAddTask(newTask);
+      const addedTask = await handleAddTask(apiClient, newTask);
   
       // Notify the parent of the newly added task
       onTaskAdded(addedTask);

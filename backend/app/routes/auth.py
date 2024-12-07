@@ -66,18 +66,38 @@ def login_user():
     if user and bcrypt.check_password_hash(user.password_hash, password):
         # Generate access and refresh tokens
         access_token = create_access_token(identity=str(user.id))
-        
-        # refresh_token = create_refresh_token(identity=str(user.id))
-        # return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
-        return jsonify({"access_token": access_token}), 200
+        refresh_token = create_refresh_token(identity=str(user.id))
+        return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
+        # return jsonify({"access_token": access_token}), 200
 
     return jsonify({"error": "Invalid credentials"}), 401
 
 
-# @auth_bp.route("/refresh", methods=["POST"])
-# @jwt_required(refresh=True)
-# def refresh():
-#     current_user = get_jwt_identity()
-#     access_token = create_access_token(identity=current_user)
-#     # add_token_to_database(access_token)
-#     return jsonify({"access_token": access_token}), 200
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=str(current_user))
+    # add_token_to_database(access_token)
+    return jsonify({"access_token": access_token}), 200
+
+@auth_bp.route("/current_user", methods=["GET"])
+@jwt_required()  # Requires a valid access token
+def get_current_user():
+    try:
+        # Get the current user ID from the JWT token
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            return jsonify({"error": "Unauthorized access"}), 401
+
+        # Query the user from the database
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Serialize the user data using Marshmallow
+        user_schema = UserSchema()
+        user_data = user_schema.dump(user)
+        return jsonify(user_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch user", "details": str(e)}), 500

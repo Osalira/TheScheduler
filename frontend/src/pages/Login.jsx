@@ -31,6 +31,7 @@ function Login() {
         password,
       });
       localStorage.setItem('authToken', response.data.access_token);
+      localStorage.setItem('refreshToken', response.data.refresh_token);
       navigate('/home');
     } catch (err) {
       if (err.response && err.response.status === 401) {

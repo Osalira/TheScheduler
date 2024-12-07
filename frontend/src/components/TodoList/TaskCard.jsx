@@ -6,7 +6,7 @@ import "./TaskCard.css";
 
 function TaskCard({ id, task, setTasks, origin, deleteTask }) {
   // console.log("deleteTask prop in TaskCard:", deleteTask);
-
+  // console.log("id card passed from todolist", id);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id,
@@ -27,6 +27,7 @@ function TaskCard({ id, task, setTasks, origin, deleteTask }) {
     height: "100%",
   };
 
+  
   const handleDelete = async () => {
     console.log("Deleting task with ID:", task.id);
     if (deleteTask) {

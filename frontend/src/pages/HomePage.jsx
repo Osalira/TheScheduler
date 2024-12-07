@@ -12,11 +12,16 @@ import WeeklyScheduler from '../components/WeeklyScheduler/WeeklyScheduler';
 import NavbarItem from '../components/NavbarItem/NavbarItem';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
-import { fetchTasks, updateTask, deleteTask, handleAddTask } from './api';
-// import {  fetchTasks, handleAddTask } from './api';
+// import { useApiClient } from "../ApiProvider";
+import { useApiClient } from './ApiProvider';
+import { fetchTasks, updateTask, deleteTask, fetchUsername, handleAddTask } from './api';
+
 
 function HomePage() {
   const [tasks, setTasks] = useState([]);
+  const apiClient = useApiClient(); // Access apiClient from context
+  const [username, setUsername] = useState("");
+
   const [schedule, setSchedule] = useState({
     // Adjust for 48 half-hour blocks (24 hours * 2)
     Monday: Array(48).fill(null), 
@@ -41,8 +46,8 @@ function HomePage() {
   useEffect(() => {
     const initializeSchedule = async () => {
       try {
-        const fetchedTasks = await fetchTasks();
-        
+        const fetchedTasks = await fetchTasks(apiClient);
+       
         const newSchedule = {
           Monday: Array(48).fill(null),
           Tuesday: Array(48).fill(null),
@@ -54,26 +59,37 @@ function HomePage() {
         };
   
         fetchedTasks.forEach((task) => {
-          if (task.day_of_week && task.time_slot !== null) {
+          if (task.day_of_week && task.time_slot !== "") {
             newSchedule[task.day_of_week][task.time_slot] = task;
           }
         });
         setSchedule(newSchedule);
-// here i'm getting filtering element in the 
+// here i'm filtering element in the 
 //todolist, such that only element not in schedule appear on todolist
 
       const todoListTasks = fetchedTasks.filter(
-        (task) => !task.day_of_week && task.time_slot === null
+        (task) => task.day_of_week === "" && task.time_slot === ""
       );
-            
+
       setTasks(todoListTasks);
+      
       } catch (error) {
         console.error('Error initializing schedule:', error);
       }
     };
-  
+    const getUsername = async () => {
+      try {
+        const fetchedUsername = await fetchUsername(apiClient);
+        console.log("fetched", fetchedUsername);
+        setUsername(fetchedUsername);
+        
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    };
+    getUsername();
     initializeSchedule();
-  }, []);
+  }, [apiClient]);
   
 
   /**
@@ -81,8 +97,6 @@ function HomePage() {
  * Time slots are identified by the format "day-hour" (e.g., "Monday-3").
  */
 const isTimeSlot = (id) => typeof id === "string" && id.includes("-");
-
-
 
 // Dealing with card ending up in occupied spot
 
@@ -117,14 +131,20 @@ const shiftTasksDown = (schedule, day, startIndex, taskToPlace) => {
 };
 
 
-const addTaskToScheduleWithShifting = (schedule, tasks, taskId, target) => {
-  const [targetDay, targetIndex] = target.split("-");
-  const draggedTask = tasks.find((task) => task.id === taskId);
+const addTaskToScheduleWithShifting = (schedule, tasks, taskId, dropTargetId) => {
+  const [targetDay, targetSlot] = dropTargetId.split("-");
+  const taskToMove = tasks.find((task) => task.id === taskId);
 
-  if (!draggedTask) return schedule;
+  if (!taskToMove) return schedule;
 
-  // Ensure tasks are shifted only if necessary
-  return shiftTasksDown(schedule, targetDay, parseInt(targetIndex, 10), draggedTask);
+  const updatedSchedule = deepCloneSchedule(schedule);
+  updatedSchedule[targetDay][parseInt(targetSlot, 10)] = {
+    ...taskToMove,
+    day_of_week: targetDay,
+    time_slot: targetSlot,
+  };
+
+  return updatedSchedule;
 };
 
 
@@ -154,10 +174,13 @@ const handleDragEnd = async(event) => {
 
   if (!over || !over.id) return; // Ensure there's a valid drop target
 
-  const taskId = active.id; // ID of the dragged task
-  const dropTargetId = over.id; // ID of the drop target
+  // const taskId = active.id; // ID of the dragged task
+  // const dropTargetId = over.id; // ID of the drop target
   // Source metadata (e.g., "todolist")
-  const sourceId = active.data.current?.source; 
+  // const sourceId = active.data.current?.source; 
+  const taskId = active.id; // ID of the dragged task
+  const sourceId = active.data.current?.source || ""; // Fallback to empty string
+  const dropTargetId = over.id; // ID of the drop target
 
   console.log("Active Task:", taskId);
   console.log("Drop Target ID:", dropTargetId);
@@ -176,7 +199,7 @@ const handleDragEnd = async(event) => {
     // Move from TodoList to WeeklyScheduler
     const [targetDay, targetSlot] = dropTargetId.split('-');
 
-    await updateTask(taskId, targetDay, parseInt(targetSlot, 10));
+    await updateTask(apiClient, taskId, targetDay, parseInt(targetSlot, 10));
 
     setSchedule((prevSchedule) =>
       addTaskToScheduleWithShifting(prevSchedule, tasks, taskId, dropTargetId)
@@ -192,24 +215,33 @@ const handleDragEnd = async(event) => {
 
     const [targetDay, targetSlot] = dropTargetId.split('-');
 
-    await updateTask(taskId, targetDay, parseInt(targetSlot, 10));
-
+    await updateTask(apiClient,taskId, targetDay, parseInt(targetSlot, 10));
+    
+    
     setSchedule((prevSchedule) =>
       moveTaskInScheduleWithShifting(prevSchedule, sourceId, dropTargetId)
     );
-  } else if (isTimeSlot(sourceId) && !isNaN(dropTargetId)) {
+  }  else if (isTimeSlot(sourceId) && (!dropTargetId || dropTargetId === "todolist")) {
     // Move from WeeklyScheduler to TodoList
     const draggedTask = Object.values(schedule)
       .flat()
       .find((task) => task?.id === taskId);
-
+  
     if (draggedTask) {
       try {
         // Update task in the backend
-        await updateTask(taskId, null, null); // Set day_of_week and time_slot to null
-
+        await updateTask(apiClient, taskId, "", ""); // Set day_of_week and time_slot to empty strings
+  
         // Update the state to reflect the changes
-        setTasks((prevTasks) => [...prevTasks, draggedTask]); // Add back to TodoList
+        setTasks((prevTasks) => {
+          // Append the dragged task to the TodoList, even if it's currently empty
+          return [
+            ...prevTasks,
+            { ...draggedTask, day_of_week: "", time_slot: "" }, // Ensure proper structure
+          ];
+        });
+  
+        // Clear the dragged task from the WeeklyScheduler
         setSchedule((prevSchedule) => {
           const updatedSchedule = deepCloneSchedule(prevSchedule);
           Object.keys(updatedSchedule).forEach((day) => {
@@ -217,20 +249,21 @@ const handleDragEnd = async(event) => {
               slot?.id === taskId ? null : slot
             );
           });
-          return updatedSchedule; // Clear the spot in WeeklyScheduler
+          return updatedSchedule;
         });
       } catch (error) {
         console.error("Error updating task:", error);
       }
     }
   }
+  
 };
 
 
 const sensors = useSensors(
   useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10, // Drag initiates only if pointer moves more than 10 pixels
+      distance: 5, // Drag initiates only if pointer moves more than 10 pixels
     },
   }),
   useSensor(TouchSensor),
@@ -242,7 +275,7 @@ const sensors = useSensors(
   return (
     <div >
       <div className=' mb-4'>
-      <NavbarItem/>
+      <NavbarItem username={username}/>
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="homepage-container content row ">

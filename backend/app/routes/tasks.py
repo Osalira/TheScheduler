@@ -3,10 +3,14 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 from app.models.task import Task
+from app.models.task import WeeklyArchive
+from app.models.task import ArchivedTask
 from app.schemas.task_schema import TaskSchema
 from app.extensions import db
-# import logging
-# import sys
+import datetime
+from sqlalchemy import and_
+
+
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -139,3 +143,73 @@ def delete_task(task_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+@tasks_bp.route('/archive_week', methods=['POST'])
+@jwt_required()
+def archive_week():
+    current_user = get_jwt_identity()
+
+    # Determine the start and end of the current week
+    today = datetime.date.today()
+    start_of_week = today - datetime.timedelta(days=today.weekday())  # Monday
+    end_of_week = start_of_week + datetime.timedelta(days=6)  # Sunday
+
+    # Check if this week has already been archived
+    existing_archive = WeeklyArchive.query.filter_by(
+        week_start_date=start_of_week,
+        week_end_date=end_of_week,
+        user_id=current_user
+    ).first()
+    if existing_archive:
+        return jsonify({"error": "This week is already archived"}), 400
+
+    # Archive the tasks
+    tasks_to_archive = Task.query.filter(
+        and_(Task.user_id == current_user, Task.day_of_week.isnot(None))
+    ).all()
+
+    if not tasks_to_archive:
+        return jsonify({"error": "No tasks to archive"}), 404
+
+    # Create the archive
+    archive = WeeklyArchive(
+        week_start_date=start_of_week,
+        week_end_date=end_of_week,
+        user_id=current_user
+    )
+    db.session.add(archive)
+    db.session.flush()
+
+    # Create archived task entries
+    for task in tasks_to_archive:
+        archived_task = ArchivedTask(
+            task_id=task.id,
+            title=task.title,
+            time_to_complete=task.time_to_complete,
+            status=task.status,
+            priority=task.priority,
+            day_of_week=task.day_of_week,
+            time_slot=task.time_slot,
+            task_description=task.task_description,
+            week_id=archive.id
+        )
+        db.session.add(archived_task)
+
+    db.session.commit()
+
+    return jsonify({"message": "Week archived successfully"}), 201
+
+@tasks_bp.route('/archived_weeks', methods=['GET'])
+@jwt_required()
+def get_archived_weeks():
+    current_user = get_jwt_identity()
+    archived_weeks = WeeklyArchive.query.filter_by(user_id=current_user).all()
+    data = []
+    for week in archived_weeks:
+        week_data = {
+            "id": week.id,
+            "week_start_date": week.week_start_date,
+            "week_end_date": week.week_end_date,
+            "tasks": [task.to_dict() for task in week.tasks]
+        }
+        data.append(week_data)
+    return jsonify(data), 200

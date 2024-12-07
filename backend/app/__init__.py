@@ -23,8 +23,10 @@ def create_app():
     # Register blueprints
     from app.routes.auth import auth_bp
     from app.routes.tasks import tasks_bp
+    # from app.routes.archives import archive_bp
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(tasks_bp, url_prefix='/api')
+    # app.register_blueprint(archive_bp, url_prefix='/api')
 
     return app
 

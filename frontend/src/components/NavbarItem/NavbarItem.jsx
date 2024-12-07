@@ -1,12 +1,13 @@
 import React from "react";
 import './NavbarItem.css';
 
-function NavbarItem() {
+function NavbarItem({ username }) {
   return (
     <div className="">
       <nav className="navbar  bg-body-tertiary fixed-top">
         <div className="container-fluid">
           <a className="navbar-brand fw-bold" href="/home">The Scheduler</a>
+          <h5 className="offcanvas-title ms-auto me-3 fw-bold" id="offcanvasNavbarLabel">{username || "Guest"}</h5>
           <button
             className="navbar-toggler"
             type="button"
@@ -24,7 +25,7 @@ function NavbarItem() {
             aria-labelledby="offcanvasNavbarLabel"
           >
             <div className="offcanvas-header">
-              <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
+              <h5 className="offcanvas-title" id="offcanvasNavbarLabel">{username || "Guest"}</h5>
               <button
                 type="button"
                 className="btn-close"
@@ -38,7 +39,7 @@ function NavbarItem() {
                   <a className="nav-link fw-bold active" aria-current="page" href="/home">Home</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link fw-bold active" aria-current="page" href="/Archives">Schedule Archive</a>
+                  <a className="nav-link fw-bold active" aria-current="page" href="/archived-weeks">Schedule Archive</a>
                 </li>
                 <li className="nav-item">
                   <a className="nav-link fw-bold active" aria-current="page" href="/Edit-Profile">Edit Profile</a>
@@ -69,15 +70,6 @@ function NavbarItem() {
                   <a className="nav-link fw-bold active" aria-current="page" href="/logout">Logout</a>
                 </li>
               </ul>
-              {/* <form className="d-flex mt-3" role="search">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
-                <button className="btn btn-outline-success" type="submit">Search</button>
-              </form> */}
             </div>
           </div>
         </div>

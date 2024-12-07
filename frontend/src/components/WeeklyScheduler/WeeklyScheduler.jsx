@@ -8,10 +8,32 @@ function WeeklyScheduler({ schedule }) {
   const days = Object.keys(schedule);
   const blockHeight = 25; // Each 30 minutes is 25px
 
+  // Helper function to calculate the current week's start and end dates
+  const getWeekRange = () => {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const sundayOffset = currentDay === 0 ? 0 : 7 - currentDay; // Days until Sunday
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // Days back to Monday
+
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + mondayOffset);
+
+    const sunday = new Date(now);
+    sunday.setDate(now.getDate() + sundayOffset);
+
+    const formatDate = (date) =>
+      date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+
+    return `Week of ${formatDate(monday)} to ${formatDate(sunday)}`;
+  };
+
   return (
     <div className="col-10">
       <div className="weekly-scheduler">
-        <h3 className="text-center styleTitleWeeklySchedule mt-5">Weekly Scheduler</h3>
+        <h3 className="text-center styleTitleWeeklySchedule mt-5">{getWeekRange()}</h3>
         <div className="weekly-scheduler-container">
           {/* Grid Layout */}
           <div
@@ -67,7 +89,6 @@ function WeeklyScheduler({ schedule }) {
                 )}
               </React.Fragment>
             ))}
-
           </div>
         </div>
       </div>
